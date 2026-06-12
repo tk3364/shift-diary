@@ -152,6 +152,13 @@
     padding: 6px 11px; font-size: 12px; color: var(--sub); cursor: pointer;
     font-family: inherit; flex-shrink: 0;
   }
+  .cur-memo {
+    width: 100%; margin-top: 8px;
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 8px 10px; font-size: 13px; font-family: inherit;
+    resize: none; background: #fffdf8; min-height: 38px;
+  }
+  .cur-memo:focus { outline: 2px solid var(--accent); border-color: transparent; }
   body:not(.view-mode) .editor { display: none; }
   .stamp.plan { font-weight: 500; }
   .hint {
@@ -361,6 +368,7 @@
       <span class="cur-info" id="cur-info"></span>
       <button class="cur-clear" id="cur-clear" title="この日の勤務と予定を消して次へ">クリア ▸</button>
     </div>
+    <textarea class="cur-memo" id="cur-memo" rows="1" placeholder="この日のメモ…"></textarea>
     <div class="hint">日付を選んでボタンを押すと入力 → 自動で次の日へ進みます。同じ予定をもう一度押すと外れます。</div>
   </div>
 
@@ -385,7 +393,7 @@
       </div>
     </div>
     <div class="sec">
-      <div class="sec-label">日記</div>
+      <div class="sec-label">メモ</div>
       <textarea class="diary" id="diary" placeholder="今日のこと、気づいたこと、一瞬のメモ…"></textarea>
       <div class="save-state" id="save-state"></div>
     </div>
@@ -558,6 +566,9 @@ function renderCursor() {
     n.textContent = '未入力';
     info.appendChild(n);
   }
+  // カーソルの日のメモを表示（入力中でなければ）
+  const memo = document.getElementById('cur-memo');
+  if (document.activeElement !== memo) memo.value = data.note || '';
 }
 function curChip(label, color) {
   const c = document.createElement('span');
@@ -566,6 +577,14 @@ function curChip(label, color) {
   c.textContent = label;
   return c;
 }
+
+document.getElementById('cur-memo').addEventListener('input', e => {
+  if (!selectedDate) return;
+  const d = { ...dayData(selectedDate), plans: [...dayData(selectedDate).plans] };
+  d.note = e.target.value;
+  setDayData(selectedDate, d);
+  renderCalendar();
+});
 
 document.getElementById('cur-prev').onclick = () => moveCursor(-1);
 document.getElementById('cur-next').onclick = () => moveCursor(1);
