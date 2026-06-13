@@ -6,12 +6,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="シフト日記">
+<meta name="apple-mobile-web-app-title" content="シフトメモ">
 <meta name="theme-color" content="#f6f5f2">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<title>シフト日記</title>
+<title>シフトメモ</title>
 <style>
   :root {
     --bg: #f6f5f2;
@@ -36,14 +36,19 @@
 
   /* ---------- header ---------- */
   header {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 4px;
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 2px 8px;
   }
-  header h1 {
-    font-size: 20px; margin: 0; flex: 1;
-    display: flex; align-items: baseline; gap: 6px;
+  .title-block { flex: 1; min-width: 0; line-height: 1.15; }
+  .title-block small { display: block; font-size: 10px; color: var(--sub); letter-spacing: .04em; }
+  .title-block h1 { font-size: 18px; margin: 0; white-space: nowrap; }
+  .mode-btn {
+    border: 1.5px solid var(--ink); background: #fff; color: var(--ink);
+    border-radius: 10px; height: 38px; padding: 0 12px;
+    font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+    flex-shrink: 0;
   }
-  header h1 small { font-size: 12px; color: var(--sub); font-weight: normal; }
+  .mode-btn:active { background: var(--line); }
   .nav-btn {
     border: 1px solid var(--line); background: var(--card);
     border-radius: 10px; width: 38px; height: 38px;
@@ -52,25 +57,13 @@
   .nav-btn.today { width: auto; padding: 0 12px; font-size: 13px; }
   .nav-btn:active { background: var(--line); }
 
-  /* ---------- mode toggle ---------- */
-  .toolbar {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 10px; padding: 0 2px;
-  }
-  .seg {
-    display: inline-flex; background: #ebe8e2; border-radius: 999px; padding: 3px;
-  }
-  .seg button {
-    border: none; background: none; border-radius: 999px;
-    padding: 6px 18px; font-size: 13px; cursor: pointer; color: var(--sub);
-    font-family: inherit;
-  }
-  .seg button.on {
-    background: #fff; color: var(--ink); font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0,0,0,.12);
-  }
+  /* ---------- mode ---------- */
   body.view-mode .palette { display: none; }
-  body.view-mode .toolbar .gear { display: none; }
+  /* 入力モードのパレットはスクロールに追従（月末でも手元に残る） */
+  body:not(.view-mode) .palette {
+    position: sticky; top: 8px; z-index: 5;
+    box-shadow: 0 6px 20px rgba(0,0,0,.10);
+  }
   .add-stamp {
     border: 1.5px dashed #c9c5bd; background: none; border-radius: 999px;
     width: 32px; height: 32px; font-size: 15px; color: var(--sub);
@@ -161,9 +154,6 @@
   .cur-memo:focus { outline: 2px solid var(--accent); border-color: transparent; }
   body:not(.view-mode) .editor { display: none; }
   .stamp.plan { font-weight: 500; }
-  .hint {
-    font-size: 11px; color: var(--sub); margin-top: 8px;
-  }
   .gear {
     border: none; background: none; font-size: 18px; cursor: pointer;
     color: var(--sub); padding: 4px 8px;
@@ -197,8 +187,10 @@
     overflow: hidden;
   }
   .cell:nth-child(7n) { border-right: none; }
-  .cell.out { background: #fafaf8; }
-  .cell.out .dnum { color: #c8c5bf; }
+  /* 月外の日ははっきり区別（斜めストライプ＋淡色） */
+  .cell.out { background: repeating-linear-gradient(-45deg, #f1ede6 0 5px, #faf8f4 5px 10px); }
+  .cell.out > * { opacity: .55; }
+  .cell.out .dnum { color: #b5b1a9; }
   .cell.today { background: #fff8f0; }
   .cell.selected { outline: 2px solid var(--accent); outline-offset: -2px; z-index: 1; }
   .cell:active { background: #f1efe9; }
@@ -269,15 +261,6 @@
     color: var(--ink);
   }
   .opt.on { color: #fff; border-color: transparent; font-weight: 600; }
-  .custom-add { display: flex; gap: 6px; margin-top: 6px; }
-  .custom-add input {
-    flex: 1; border: 1px solid var(--line); border-radius: 8px;
-    padding: 7px 10px; font-size: 13px; font-family: inherit;
-  }
-  .custom-add button {
-    border: none; background: var(--ink); color: #fff;
-    border-radius: 8px; padding: 0 14px; font-size: 13px; cursor: pointer;
-  }
   textarea.diary {
     width: 100%; min-height: 90px;
     border: 1px solid var(--line); border-radius: 10px;
@@ -339,18 +322,15 @@
 <div class="wrap">
   <header>
     <button class="nav-btn" id="prev">‹</button>
-    <h1><span id="month-title"></span><small>シフト日記</small></h1>
+    <div class="title-block">
+      <small>シフトメモ</small>
+      <h1 id="month-title"></h1>
+    </div>
+    <button class="mode-btn" id="mode-btn"></button>
     <button class="nav-btn today" id="today-btn">今日</button>
+    <button class="gear" id="gear" title="スタンプの編集・削除">⚙</button>
     <button class="nav-btn" id="next">›</button>
   </header>
-
-  <div class="toolbar">
-    <div class="seg">
-      <button id="mode-view">閲覧</button>
-      <button id="mode-input">✏️ 入力</button>
-    </div>
-    <button class="gear" id="gear" title="スタンプの編集・削除" style="margin-left:auto">⚙</button>
-  </div>
 
   <div class="palette">
     <div class="row">
@@ -369,7 +349,6 @@
       <button class="cur-clear" id="cur-clear" title="この日の勤務と予定を消して次へ">クリア ▸</button>
     </div>
     <textarea class="cur-memo" id="cur-memo" rows="1" placeholder="この日のメモ…"></textarea>
-    <div class="hint">日付を選んでボタンを押すと入力 → 自動で次の日へ進みます。同じ予定をもう一度押すと外れます。</div>
   </div>
 
   <div class="cal">
@@ -381,21 +360,16 @@
 
   <div class="editor" id="editor">
     <h2><span id="editor-date"></span><span id="editor-shift-badge"></span>
-      <button class="to-input-btn" id="to-input" style="margin-left:auto">✏️ この日を編集</button>
+      <button class="to-input-btn" id="to-input" style="margin-left:auto">Fill in</button>
       <button class="close" id="editor-close">✕</button>
     </h2>
     <div class="sec">
-      <div class="sec-label">予定（チップをタップで削除）</div>
-      <div class="view-chips" id="view-chips"></div>
-      <div class="custom-add">
-        <input type="text" id="custom-plan" placeholder="その他の予定を入力…" maxlength="30">
-        <button id="custom-plan-add">追加</button>
-      </div>
-    </div>
-    <div class="sec">
-      <div class="sec-label">メモ</div>
       <textarea class="diary" id="diary" placeholder="今日のこと、気づいたこと、一瞬のメモ…"></textarea>
       <div class="save-state" id="save-state"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-label">予定（チップをタップで削除）</div>
+      <div class="view-chips" id="view-chips"></div>
     </div>
   </div>
 </div>
@@ -524,7 +498,15 @@ function applyStamp(type, id) {
   } else {
     const entry = 'p:' + id;
     const i = d.plans.indexOf(entry);
-    if (i >= 0) d.plans.splice(i, 1); else d.plans.push(entry);
+    if (i >= 0) {
+      // 削除のときはその日に留まる（押し間違いを直す操作なので）
+      d.plans.splice(i, 1);
+      setDayData(selectedDate, d);
+      renderCalendar();
+      renderCursor();
+      return;
+    }
+    d.plans.push(entry);
   }
   setDayData(selectedDate, d);
   moveCursor(1);
@@ -785,21 +767,6 @@ function closeEditor() {
 
 document.getElementById('editor-close').onclick = closeEditor;
 
-document.getElementById('custom-plan-add').onclick = addCustomPlan;
-document.getElementById('custom-plan').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); addCustomPlan(); }
-});
-function addCustomPlan() {
-  const input = document.getElementById('custom-plan');
-  const text = input.value.trim();
-  if (!text || !selectedDate) return;
-  const d2 = { ...dayData(selectedDate), plans: [...dayData(selectedDate).plans] };
-  d2.plans.push('c:' + text);
-  setDayData(selectedDate, d2);
-  input.value = '';
-  renderCalendar(); renderEditor();
-}
-
 let saveTimer = null;
 document.getElementById('diary').addEventListener('input', e => {
   if (!selectedDate) return;
@@ -880,8 +847,8 @@ function applyMode(m) {
   mode = m;
   localStorage.setItem('shift-diary-mode', m);
   document.body.classList.toggle('view-mode', m === 'view');
-  document.getElementById('mode-view').classList.toggle('on', m === 'view');
-  document.getElementById('mode-input').classList.toggle('on', m === 'input');
+  // ボタンには「押すと切り替わる先」のモードを表示
+  document.getElementById('mode-btn').textContent = m === 'view' ? 'Fill in' : 'View';
   addingTo = null;
   if (m === 'input') {
     // カーソルがなければ今日（表示中の月の外なら月初）に置く
@@ -898,9 +865,26 @@ function applyMode(m) {
   renderCalendar();
   renderCursor();
 }
-document.getElementById('mode-view').onclick = () => applyMode('view');
-document.getElementById('mode-input').onclick = () => applyMode('input');
+document.getElementById('mode-btn').onclick = () => applyMode(mode === 'view' ? 'input' : 'view');
 document.getElementById('to-input').onclick = () => applyMode('input');
+
+/* ---------- swipe で月移動 ---------- */
+(() => {
+  const cal = document.querySelector('.cal');
+  let sx = null, sy = null;
+  cal.addEventListener('touchstart', e => {
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+  }, { passive: true });
+  cal.addEventListener('touchend', e => {
+    if (sx === null) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    sx = sy = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      navMonth(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+})();
 
 /* ---------- init ---------- */
 applyMode(mode);

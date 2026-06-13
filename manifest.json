@@ -1,7 +1,7 @@
 {
-  "name": "シフト日記",
-  "short_name": "シフト日記",
-  "description": "ワンタッチで勤務と予定を記録するシフトカレンダー日記",
+  "name": "シフトメモ",
+  "short_name": "シフトメモ",
+  "description": "ワンタッチで勤務と予定を記録するシフトカレンダーメモ",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
