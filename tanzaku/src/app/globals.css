@@ -1,0 +1,375 @@
+:root {
+  --paper: #faf8f3;
+  --ink: #201d18;
+  --ink-faint: #928c7d;
+  --hairline: #e5dfd2;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mincho), "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho",
+    "YuMincho", "Noto Serif JP", "Noto Serif CJK JP", serif;
+  font-size: 16px;
+  line-height: 1.9;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---- 骨格 ---- */
+
+.frame {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 6rem;
+}
+
+.siteHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.5rem 0 2.5rem;
+}
+
+.siteHeader .mark {
+  font-size: 1.05rem;
+  letter-spacing: 0.5em;
+}
+
+.siteHeader nav {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+}
+
+.siteHeader nav a:hover {
+  color: var(--ink);
+}
+
+/* ---- 縦書き ---- */
+
+.vert {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.14em;
+  line-height: 2.1;
+  white-space: pre-wrap;
+}
+
+/* ---- タイムライン ---- */
+
+.dayNav {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  padding-bottom: 3rem;
+}
+
+.dayNav .day {
+  color: var(--ink);
+  letter-spacing: 0.2em;
+}
+
+.dayNav a:hover {
+  color: var(--ink);
+}
+
+.dayNav .mute {
+  visibility: hidden;
+}
+
+.strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 0;
+}
+
+.strip + .strip {
+  border-top: 1px solid var(--hairline);
+}
+
+.strip .body {
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.strip .attrib,
+.attrib {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.15em;
+  padding-top: 1.75rem;
+}
+
+.attrib a:hover {
+  color: var(--ink);
+}
+
+.dayEnd {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.4em;
+  padding: 5rem 0 2rem;
+}
+
+.empty {
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: 0.9rem;
+  padding: 6rem 0;
+  letter-spacing: 0.2em;
+}
+
+/* ---- 詳細 ---- */
+
+.poemStage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0 1rem;
+}
+
+.poemStage .body {
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+  overflow-x: auto;
+  animation: nijimu 1.6s ease-out both;
+}
+
+@keyframes nijimu {
+  from {
+    opacity: 0;
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poemStage .body {
+    animation: none;
+  }
+}
+
+.motoUta {
+  padding: 1.5rem 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.motoUta .label {
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.3em;
+}
+
+.sectionTitle {
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.5em;
+  padding: 4rem 0 1.5rem;
+  text-align: center;
+}
+
+.henka {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 0;
+}
+
+.henka + .henka {
+  border-top: 1px dashed var(--hairline);
+}
+
+.layer {
+  padding: 1.4rem 0;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.92rem;
+}
+
+.layer:first-of-type {
+  border-top: none;
+}
+
+.layer .meta {
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.15em;
+  padding-bottom: 0.4rem;
+}
+
+.layer .prose {
+  white-space: pre-wrap;
+}
+
+.quietNote {
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: 0.85rem;
+  padding: 2rem 0;
+  letter-spacing: 0.1em;
+}
+
+.actRow {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 2rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+}
+
+.actRow a {
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 0.1em;
+}
+
+.actRow a:hover {
+  color: var(--ink);
+  border-color: var(--ink-faint);
+}
+
+/* ---- フォーム ---- */
+
+.formCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 1rem 0;
+}
+
+input[type="text"],
+input[type="password"],
+textarea {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  padding: 0.5rem 0.2rem;
+  outline: none;
+  border-radius: 0;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--ink-faint);
+}
+
+textarea.proseInput {
+  width: 100%;
+  min-height: 6.5rem;
+  border: 1px solid var(--hairline);
+  padding: 0.8rem;
+  line-height: 1.9;
+  resize: vertical;
+}
+
+.vertInput {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  height: min(26rem, 60vh);
+  min-width: 8rem;
+  max-width: 100%;
+  font-size: 1.5rem;
+  letter-spacing: 0.14em;
+  line-height: 2.1;
+  border: none;
+  border-right: 1px solid var(--hairline);
+  padding: 0.5rem 0.6rem;
+  resize: none;
+  align-self: center;
+}
+
+.vertInput:focus {
+  border-right-color: var(--ink-faint);
+}
+
+button {
+  font: inherit;
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink-faint);
+  padding: 0.55rem 2rem;
+  cursor: pointer;
+  align-self: center;
+}
+
+button:hover {
+  border-color: var(--ink);
+}
+
+button:disabled {
+  color: var(--ink-faint);
+  border-color: var(--hairline);
+  cursor: default;
+}
+
+.fieldNote {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.errorNote {
+  font-size: 0.85rem;
+  color: #8c3f2e;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.authGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  padding-top: 2rem;
+}
+
+.authBlock h2 {
+  font-size: 0.85rem;
+  font-weight: normal;
+  color: var(--ink-faint);
+  letter-spacing: 0.5em;
+  text-align: center;
+  padding-bottom: 1rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.2em;
+}
