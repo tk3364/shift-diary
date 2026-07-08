@@ -67,14 +67,14 @@ export function ComposeForm({ replyTo }: { replyTo?: number }) {
     <form action={action} className="formCol">
       {replyTo !== undefined && <input type="hidden" name="reply_to" value={replyTo} />}
       <textarea
-        className="vertInput"
+        className="composeInput"
         name="body"
         maxLength={60}
         autoFocus
         onChange={(e) => setCount([...e.target.value.trim()].length)}
         aria-label="歌の本文"
       />
-      <p className="fieldNote">{count === 0 ? "六十字まで。削るほど、大きく載ります。" : `${count} 字`}</p>
+      <p className="fieldNote">{count === 0 ? "六十字まで。" : `${count} 字`}</p>
       {state?.error && <p className="errorNote">{state.error}</p>}
       <button type="submit" disabled={pending}>
         {replyTo !== undefined ? "返す" : "詠む"}

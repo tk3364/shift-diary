@@ -21,7 +21,7 @@ export default async function PoemPage({ params }: { params: Promise<{ id: strin
   return (
     <main>
       <section className="poemStage">
-        <PoemBody body={poem.body} />
+        <PoemBody body={poem.body} size="large" />
         <p className="attrib">
           {poem.handle}
           {"　"}
@@ -33,7 +33,7 @@ export default async function PoemPage({ params }: { params: Promise<{ id: strin
         <section className="motoUta">
           <p className="label">元歌</p>
           <Link href={`/poem/${motoUta.id}`}>
-            <PoemBody body={motoUta.body} scale={0.45} />
+            <PoemBody body={motoUta.body} size="small" />
           </Link>
           <p className="attrib">{motoUta.handle}</p>
         </section>
@@ -53,7 +53,7 @@ export default async function PoemPage({ params }: { params: Promise<{ id: strin
           {henka.map((reply) => (
             <article key={reply.id} className="henka">
               <Link href={`/poem/${reply.id}`} aria-label="返歌の詳細へ">
-                <PoemBody body={reply.body} scale={0.6} />
+                <PoemBody body={reply.body} />
               </Link>
               <p className="attrib">{reply.handle}</p>
             </article>

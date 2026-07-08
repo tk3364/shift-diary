@@ -1,12 +1,11 @@
-import { poemStyle } from "@/lib/size";
-
-/** 縦書き・可変サイズの歌本体。scale で控えめ表示(返歌一覧など)にできる。 */
-export default function PoemBody({ body, scale = 1 }: { body: string; scale?: number }) {
-  return (
-    <div className="body">
-      <p className="vert" style={poemStyle(body, scale)}>
-        {body}
-      </p>
-    </div>
-  );
+/** 歌本体。どの歌も同じ大きさで載せる(字数で扱いを変えない)。 */
+export default function PoemBody({
+  body,
+  size = "regular",
+}: {
+  body: string;
+  size?: "large" | "regular" | "small";
+}) {
+  const cls = size === "regular" ? "poemText" : `poemText ${size}`;
+  return <p className={cls}>{body}</p>;
 }

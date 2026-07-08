@@ -40,7 +40,7 @@ export default async function YomuPage({
         <section className="motoUta">
           <p className="label">元歌</p>
           <Link href={`/poem/${motoUta.id}`}>
-            <PoemBody body={motoUta.body} scale={0.5} />
+            <PoemBody body={motoUta.body} size="small" />
           </Link>
           <p className="attrib">{motoUta.handle}</p>
         </section>

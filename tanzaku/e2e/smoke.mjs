@@ -40,12 +40,14 @@ await a.goto(BASE + "/yomu");
 const limitMsg = await a.locator("main").textContent();
 check("一日一首の制限が効く", limitMsg.includes("もう詠みました"));
 
-// --- 完了条件2: タイムラインで短い歌が大きく表示される ---
-// B が長めの歌を(比較用に)…はBの1日枠を返歌に使うため、フォントサイズは同一ページ内の相対比較でなく size 関数を信頼。
-// 代わりに timeline 上で A の歌のフォントサイズが本文より十分大きいことを確認。
+// --- タイムライン: 歌は横書き・地の文より大きい統一サイズで表示される ---
 await b.goto(BASE + "/");
-const fs = await b.locator(".strip .vert").first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-check(`タイムラインで短い歌が大きい (font-size=${fs}px > 30px)`, fs > 30);
+const style = await b.locator(".strip .poemText").first().evaluate((el) => {
+  const cs = getComputedStyle(el);
+  return { mode: cs.writingMode, size: parseFloat(cs.fontSize) };
+});
+check(`タイムラインの歌は横書き (writing-mode=${style.mode})`, style.mode === "horizontal-tb");
+check(`歌のサイズは地の文より大きい (font-size=${style.size}px > 16px)`, style.size > 16);
 if (SHOT) await b.screenshot({ path: SHOT + "/timeline.png", fullPage: true });
 
 // --- 完了条件3: 返歌と解凍を付けられ、詳細で層として読める ---

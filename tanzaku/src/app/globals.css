@@ -62,14 +62,25 @@ a {
   color: var(--ink);
 }
 
-/* ---- 縦書き ---- */
+/* ---- 歌本体 ---- */
 
-.vert {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  letter-spacing: 0.14em;
-  line-height: 2.1;
+.poemText {
+  font-size: 1.35rem;
+  line-height: 2.3;
+  letter-spacing: 0.06em;
   white-space: pre-wrap;
+  text-align: center;
+  text-wrap: balance;
+  max-width: 30rem;
+}
+
+.poemText.large {
+  font-size: 1.6rem;
+}
+
+.poemText.small {
+  font-size: 1rem;
+  line-height: 2.1;
 }
 
 /* ---- タイムライン ---- */
@@ -100,18 +111,11 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2.5rem 0;
+  padding: 3.5rem 0;
 }
 
 .strip + .strip {
   border-top: 1px solid var(--hairline);
-}
-
-.strip .body {
-  display: flex;
-  justify-content: center;
-  max-width: 100%;
-  overflow-x: auto;
 }
 
 .strip .attrib,
@@ -148,14 +152,10 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 0 1rem;
+  padding: 4rem 0 1rem;
 }
 
-.poemStage .body {
-  display: flex;
-  justify-content: center;
-  max-width: 100%;
-  overflow-x: auto;
+.poemStage .poemText {
   animation: nijimu 1.6s ease-out both;
 }
 
@@ -171,7 +171,7 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .poemStage .body {
+  .poemStage .poemText {
     animation: none;
   }
 }
@@ -293,24 +293,20 @@ textarea.proseInput {
   resize: vertical;
 }
 
-.vertInput {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  height: min(26rem, 60vh);
-  min-width: 8rem;
-  max-width: 100%;
-  font-size: 1.5rem;
-  letter-spacing: 0.14em;
-  line-height: 2.1;
+.composeInput {
+  width: 100%;
+  min-height: 9rem;
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  line-height: 2.3;
   border: none;
-  border-right: 1px solid var(--hairline);
-  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--hairline);
+  padding: 0.8rem 0.2rem;
   resize: none;
-  align-self: center;
 }
 
-.vertInput:focus {
-  border-right-color: var(--ink-faint);
+.composeInput:focus {
+  border-bottom-color: var(--ink-faint);
 }
 
 button {
