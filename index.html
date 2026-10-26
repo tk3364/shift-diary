@@ -284,6 +284,8 @@
   .modal h2 { margin: 0 0 4px; font-size: 17px; }
   .modal p.desc { margin: 0 0 14px; font-size: 12px; color: var(--sub); }
   .modal h3 { font-size: 13px; margin: 16px 0 8px; color: var(--sub); }
+  .export-row { display: flex; gap: 16px; margin: 4px 0 10px; font-size: 13px; }
+  .export-row label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
   .edit-row {
     display: flex; gap: 6px; align-items: center; margin-bottom: 6px;
   }
@@ -384,6 +386,15 @@
     <h3>予定プリセット</h3>
     <div id="edit-presets"></div>
     <button class="add-item" id="add-preset">＋ 予定を追加</button>
+
+    <h3>カレンダーに書き出す</h3>
+    <p class="desc">記入したシフトと予定を .ics ファイルに書き出します。Google カレンダーの「設定 → インポート」で取り込めます（終日の予定として入ります）。</p>
+    <div class="export-row">
+      <label><input type="radio" name="export-range" value="month" checked> 表示中の月だけ</label>
+      <label><input type="radio" name="export-range" value="all"> 全期間</label>
+    </div>
+    <button class="add-item" id="export-ics">⬇ .ics を書き出す</button>
+
     <div class="modal-actions">
       <button class="btn-cancel" id="modal-cancel">キャンセル</button>
       <button class="btn-save" id="modal-save">保存</button>
@@ -791,6 +802,72 @@ document.getElementById('today-btn').onclick = () => {
   view = new Date();
   if (mode === 'view') closeEditor();
   else { selectedDate = fmt(new Date()); renderCalendar(); renderCursor(); }
+};
+
+/* ---------- ics export ---------- */
+function icsEscape(t) {
+  return String(t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+}
+function ymdCompact(key) { return key.replace(/-/g, ''); }        // 'YYYY-MM-DD' -> 'YYYYMMDD'
+function nextDay(key) {                                            // 終日イベントのDTENDは翌日
+  const d = new Date(key + 'T00:00:00');
+  d.setDate(d.getDate() + 1);
+  return fmt(d);
+}
+function dtStamp() {                                               // 'YYYYMMDDTHHMMSSZ'
+  return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+}
+function buildICS(scope) {
+  const stamp = dtStamp();
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//shift-diary//JP',
+    'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'
+  ];
+  const keys = Object.keys(state.days).sort().filter(key => {
+    if (scope === 'all') return true;
+    return key.slice(0, 7) === fmt(view).slice(0, 7);             // 表示中の月（YYYY-MM）
+  });
+  let count = 0;
+  keys.forEach(key => {
+    const data = state.days[key];
+    // タイトル：シフト名を頭に、予定名を続ける
+    const parts = [];
+    if (data.shift) { const s = shiftById(data.shift); if (s) parts.push(s.name); }
+    (data.plans || []).forEach(e => { const l = planLabel(e); if (l) parts.push(l); });
+    const summary = parts.join(' / ');
+    if (!summary && !(data.note && data.note.trim())) return;      // 中身が無い日は出さない
+    const uid = 'shiftdiary-' + key + '@tk3364.github.io';         // 日付固定UID→再取込で重複しない
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:' + uid);
+    lines.push('DTSTAMP:' + stamp);
+    lines.push('DTSTART;VALUE=DATE:' + ymdCompact(key));
+    lines.push('DTEND;VALUE=DATE:' + ymdCompact(nextDay(key)));
+    lines.push('SUMMARY:' + icsEscape(summary || 'メモ'));
+    if (data.note && data.note.trim()) lines.push('DESCRIPTION:' + icsEscape(data.note.trim()));
+    lines.push('TRANSP:TRANSPARENT');
+    lines.push('END:VEVENT');
+    count++;
+  });
+  lines.push('END:VCALENDAR');
+  return { text: lines.join('\r\n'), count };
+}
+document.getElementById('export-ics').onclick = () => {
+  const scope = document.querySelector('input[name="export-range"]:checked').value;
+  const { text, count } = buildICS(scope);
+  if (count === 0) {
+    alert(scope === 'all' ? '書き出せる予定がまだありません。' : 'この月に書き出せる予定がありません。');
+    return;
+  }
+  const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const suffix = scope === 'all' ? 'all' : fmt(view).slice(0, 7);
+  a.href = url;
+  a.download = 'shift-diary-' + suffix + '.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
 /* ---------- settings modal ---------- */
